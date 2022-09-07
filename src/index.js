@@ -3,17 +3,18 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/styles.css';
 
 // Business Logic
+// ${process.env.API_KEY}
 
-function getWeather(city) {
+function getRandomRecipe() {
   let request = new XMLHttpRequest();
-  const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.API_KEY}`;
+  const url = `https://www.themealdb.com/api/json/v1/1/random.php`;
 
   request.addEventListener("loadend", function() {
     const response = JSON.parse(this.responseText);
     if (this.status === 200) {
-      printElements(response, city);
+      printElements(response);
     } else {
-      printError(this, response, city);
+      printError(this, response);
     }
   });
 
@@ -23,25 +24,18 @@ function getWeather(city) {
 
 // UI Logic
 
-function printError(request, apiResponse, city) {
-  document.querySelector('#showResponse').innerText = `There was an error accessing the weather data for ${city}: ${request.status} ${request.statusText}: ${apiResponse.message}`;
+function printError(request, apiResponse) {
+  document.querySelector('#showResponse').innerText = `There was an error accessing getting a random recipe: ${request.status} ${request.statusText}: ${apiResponse.message}`;
 }
 
-function printElements(apiResponse, city) { 
-  document.querySelector('#showResponse').innerText = `The humidity in ${city} is ${apiResponse.main.humidity}%.
-  The temperature in Fahrenheit is ${(1.8 * (apiResponse.main.temp-273))+32} degrees.
-  The temperature in Kelvin is ${apiResponse.main.temp} degrees.
-  The timezone is ${apiResponse.timezone}.
-  The tempurature feels like ${apiResponse.main.feels_like} degrees Kelvin.
-  Sunrise will occur at ${apiResponse.sys.sunrise} UTC.
-  Sunset will occur at ${apiResponse.sys.sunset} UTC.`; 
+function printElements(apiResponse) { 
+  console.log(apiResponse.meals[0])
+  document.querySelector('#showResponse').innerText = `Make ${apiResponse.meals[0].strMeal} for your fam bam tonight!`; 
 }
 
 function handleFormSubmission(event) {
   event.preventDefault();
-  const city = document.querySelector('#location').value;
-  document.querySelector('#location').value = null;
-  getWeather(city);
+  getRandomRecipe();
 }
 
 window.addEventListener("load", function() {
